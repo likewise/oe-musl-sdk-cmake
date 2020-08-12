@@ -1,0 +1,3 @@
+[submodule "poky-zeus"]
+	path = poky-zeus
+	url = ./poky-zeus/

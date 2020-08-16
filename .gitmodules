@@ -1,3 +1,4 @@
 [submodule "openembedded-core"]
-	url = git://git.openembedded.org/openembedded-core
+	url = ./openembedded-core
 	branch = dunfell
+	path = openembedded-core

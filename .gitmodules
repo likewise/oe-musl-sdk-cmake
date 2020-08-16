@@ -2,3 +2,6 @@
 	url = git://git.openembedded.org/openembedded-core
 	branch = dunfell
 	path = openembedded-core
+[submodule "bitbake"]
+	path = bitbake
+	url = ./bitbake

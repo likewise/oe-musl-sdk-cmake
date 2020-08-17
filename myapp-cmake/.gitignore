@@ -1,4 +1,5 @@
 oe-logs
 oe-workdir
 build
+build_sdk
 myapp

@@ -1,5 +1,8 @@
+# Proves that -mmusl is missing in the SDK
 all: ./myapp-cmake/build/myapp ./myapp-cmake/build_sdk/myapp
-	diff myapp-cmake/build*/CMakeFiles/myapp.dir/flags.make
+	(grep -rne mmusl myapp-cmake/build/CMakeFiles/myapp.dir && echo -e "=== BitBake App Build: PASS ===\n") || echo -e "=== BitBake App Build: FAIL ===\n"
+
+	(grep -rne mmusl myapp-cmake/build_sdk/CMakeFiles/myapp.dir && echo -e "===SDK App Build: PASS ===\n") || echo -e "=== SDK App Build: FAIL ===\n"
 
 # Clean both application builds
 clean: clean_app_bitbake clean_app_sdk
@@ -33,7 +36,7 @@ clean_app_sdk:
 	cd myapp-cmake && \
 	mkdir -p build_sdk && \
 	cd build_sdk && \
-	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake . .. && \
+	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake -DCMAKE_VERBOSE_MAKEFILE=1 . .. && \
 	make)
 
 #

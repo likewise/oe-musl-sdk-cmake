@@ -27,7 +27,7 @@ clean_app_sdk:
 	./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh -d /tmp/oe-sdk-cmake -y
 
 # Application Build using OE Bitbake:
-./myapp-cmake/build/myapp:
+./myapp-cmake/build/myapp: openembedded-core/oe-init-build-env bitbake/bin/bitbake
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake)
 
 # Application Build using Installed SDK
@@ -42,3 +42,9 @@ clean_app_sdk:
 #
 #	(rm -rf build_sdk; mkdir -p build_sdk) && \
 #
+openembedded-core/oe-init-build-env:
+	git submodule update --init --recursive
+
+bitbake/bin/bitbake:
+	git submodule update --init --recursive
+

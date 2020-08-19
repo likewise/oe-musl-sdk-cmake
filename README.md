@@ -6,13 +6,16 @@ OE is configured to use MUSL as the C library.
 
 It demonstrates both the BitBake approach, as well as the (standard) SDK approach.
 
-In the current release, however, the SDK/CMake approach does not seem to pass the -mmusl
-flag to the cross-compiler and linker, resulting in using (amongst other) the ld for GLIBC.
+# bug #13459
 
-Still under investigation is why, it is set here:
+https://bugzilla.yoctoproject.org/show_bug.cgi?id=13459
+
+Proposed patch: toolchain-scripts-musl.patch
+
+During SDK build, OVERRIDES contains libc-glibc, so in toolchain-script.bbclass, this
 
 TARGET_CC_ARCH_append-libc-musl = " -mmusl" 
 
-Reproduce:
+will not work. This will:
 
-make
+TARGET_CC_ARCH_append-linux-musl = " -mmusl" 

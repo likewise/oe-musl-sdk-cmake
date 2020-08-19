@@ -1,11 +1,16 @@
 # Proves that -mmusl is missing in the SDK
 all: ./myapp-cmake/build/myapp ./myapp-cmake/build_sdk/myapp
+	file myapp-cmake/build/myapp
+	# Check for -mmusl flag
 	(grep -rne mmusl myapp-cmake/build/CMakeFiles/myapp.dir && echo -e "=== BitBake App Build: PASS ===\n") || echo -e "=== BitBake App Build: FAIL ===\n"
 
+	file myapp-cmake/build_sdk/myapp
+	# Check for -mmusl flag
 	(grep -rne mmusl myapp-cmake/build_sdk/CMakeFiles/myapp.dir && echo -e "===SDK App Build: PASS ===\n") || echo -e "=== SDK App Build: FAIL ===\n"
 
-# Clean both application builds
-clean: clean_app_bitbake clean_app_sdk
+# Clean both application builds, the installed SDK and SDK installer
+clean: clean_app_bitbake clean_app_sdk clean_sdk
+
 
 # Clean the application that was built with BitBake
 clean_app_bitbake:
@@ -15,11 +20,11 @@ clean_app_bitbake:
 clean_app_sdk:
 	rm -rf ./myapp-cmake/build_sdk
 
+# Clean the installed SDK and SDK installer
 clean_sdk:
 	rm -rf /tmp/oe-sdk-cmake
 	rm -rf ./build/tmp-musl/deploy/sdk
 	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal -c cleanall)
-
 
 # Tell make these targets are phony; i.e. not real files
 .PHONY: clean clean_app_bitbake clean_app_sdk
@@ -45,9 +50,6 @@ clean_sdk:
 	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake -DCMAKE_VERBOSE_MAKEFILE=1 . .. && \
 	make)
 
-#
-#	(rm -rf build_sdk; mkdir -p build_sdk) && \
-#
 openembedded-core/oe-init-build-env:
 	git submodule update --init --recursive
 

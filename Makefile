@@ -15,6 +15,12 @@ clean_app_bitbake:
 clean_app_sdk:
 	rm -rf ./myapp-cmake/build_sdk
 
+clean_sdk:
+	rm -rf /tmp/oe-sdk-cmake
+	rm -rf ./build/tmp-musl/deploy/sdk
+	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal -c cleanall)
+
+
 # Tell make these targets are phony; i.e. not real files
 .PHONY: clean clean_app_bitbake clean_app_sdk
 

@@ -6,3 +6,6 @@
 	url = git://git.openembedded.org/bitbake
 	branch = 1.46
 	path = bitbake
+[submodule "meta-clang"]
+	path = meta-clang
+	url = https://github.com/kraj/meta-clang.git

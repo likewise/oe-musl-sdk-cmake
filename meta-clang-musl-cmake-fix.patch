@@ -1,0 +1,15 @@
+Remove leaked -mmusl from toolchain.cmake, must not be there for Clang.
+
+This is a work-around. Reported to meta-clang maintainer Khem Raj.
+diff --git a/classes/clang.bbclass b/classes/clang.bbclass
+index a00eef6..c7995f4 100644
+--- a/classes/clang.bbclass
++++ b/classes/clang.bbclass
+@@ -100,5 +100,6 @@ cmake_do_generate_toolchain_file_append_toolchain-clang () {
+     cat >> ${WORKDIR}/toolchain.cmake <<EOF
+ set( CMAKE_CLANG_TIDY ${CLANG_TIDY} )
+ EOF
++    sed -i 's/ -mmusl / /g' ${WORKDIR}/toolchain.cmake
+ }
+
+

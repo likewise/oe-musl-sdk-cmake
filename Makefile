@@ -1,24 +1,38 @@
-# Proves that -mmusl is missing in the SDK
-all: ./myapp-cmake/build/myapp ./myapp-cmake/build_sdk/myapp
-	file myapp-cmake/build/myapp
+# Bitbake MUSL CMake Clang combo broken because -mmusl leaks into toolchain.cmake
+#all: ./myapp-cmake/build_bitbake/myapp ./myapp-cmake/build_bitbake_clang/myapp ./myapp-cmake/build_sdk/myapp ./myapp-cmake/build_sdk_clang/myapp
+
+all: ./myapp-cmake/build_bitbake/myapp ./myapp-cmake/build_sdk/myapp ./myapp-cmake/build_sdk_clang/myapp
+
+	file myapp-cmake/build_bitbake/myapp
+	file myapp-cmake/build_bitbake_clang/myapp
 	# Check for -mmusl flag
-	(grep -rne mmusl myapp-cmake/build/CMakeFiles/myapp.dir && echo -e "=== BitBake App Build: PASS ===\n") || echo -e "=== BitBake App Build: FAIL ===\n"
+	#(grep -rne mmusl myapp-cmake/build/CMakeFiles/myapp.dir && echo -e "=== BitBake App Build: PASS ===\n") || echo -e "=== BitBake App Build: FAIL ===\n"
 
 	file myapp-cmake/build_sdk/myapp
+	file myapp-cmake/build_sdk_clang/myapp
 	# Check for -mmusl flag
-	(grep -rne mmusl myapp-cmake/build_sdk/CMakeFiles/myapp.dir && echo -e "===SDK App Build: PASS ===\n") || echo -e "=== SDK App Build: FAIL ===\n"
+	#(grep -rne mmusl myapp-cmake/build_sdk/CMakeFiles/myapp.dir && echo -e "===SDK App Build: PASS ===\n") || echo -e "=== SDK App Build: FAIL ===\n"
 
 # Clean both application builds, the installed SDK and SDK installer
-clean: clean_app_bitbake clean_app_sdk clean_sdk
+clean: clean_app clean_sdk
 
+clean_app: clean_app_bitbake clean_app_bitbake_clang clean_app_sdk clean_app_sdk_clang
 
 # Clean the application that was built with BitBake
 clean_app_bitbake:
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake -c cleanall)
 
+# Clean the application that was built with BitBake Clang
+clean_app_bitbake:
+	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake-clang -c cleanall)
+
 # Clean the application built with SDK
 clean_app_sdk:
 	rm -rf ./myapp-cmake/build_sdk
+
+# Clean the application built with SDK Clang
+clean_app_sdk_clang:
+	rm -rf ./myapp-cmake/build_sdk_clang
 
 # Clean the installed SDK and SDK installer
 clean_sdk:
@@ -27,7 +41,7 @@ clean_sdk:
 	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal -c cleanall)
 
 # Tell make these targets are phony; i.e. not real files
-.PHONY: clean clean_app_bitbake clean_app_sdk
+.PHONY: clean clean_app_bitbake clean_app_sdk clean_app_sdk_clang
 
 # SDK Installer Build
 ./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh:
@@ -38,8 +52,12 @@ clean_sdk:
 	./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh -d /tmp/oe-sdk-cmake -y
 
 # Application Build using OE Bitbake:
-./myapp-cmake/build/myapp: openembedded-core/oe-init-build-env bitbake/bin/bitbake
+./myapp-cmake/build_bitbake/myapp: openembedded-core/oe-init-build-env bitbake/bin/bitbake
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake)
+
+# Application Build using OE Bitbake w/ Clang:
+./myapp-cmake/build_bitbake_clang/myapp: openembedded-core/oe-init-build-env bitbake/bin/bitbake
+	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake-clang)
 
 # Application Build using Installed SDK
 ./myapp-cmake/build_sdk/myapp: /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl
@@ -47,6 +65,18 @@ clean_sdk:
 	cd myapp-cmake && \
 	mkdir -p build_sdk && \
 	cd build_sdk && \
+	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake -DCMAKE_VERBOSE_MAKEFILE=1 . .. && \
+	make)
+
+# Application Build using Installed SDK Clang
+./myapp-cmake/build_sdk_clang/myapp: /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl
+	(source /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl && \
+	export CC=$$CLANGCC && \
+	export CPP=$$CLANGCPP && \
+	export CXX=$$CLANGCXX && \
+	cd myapp-cmake && \
+	mkdir -p build_sdk_clang && \
+	cd build_sdk_clang && \
 	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake -DCMAKE_VERBOSE_MAKEFILE=1 . .. && \
 	make)
 

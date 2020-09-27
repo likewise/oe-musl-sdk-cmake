@@ -33,8 +33,7 @@ EXTERNALSRC_BUILD = "${EXTERNALSRC}/build"
 #WORKDIR = "${EXTERNALSRC}/build_using_bitbake"
 
 # This populates a SDK/toolchain for this specific recipe, usuable by other IDE's.
-# Used by the Neuron product top-level, to allow quickly rebuilding a modified
-# SMARC app.
+# To allow quickly rebuilding a modified app.
 do_populate_ide_support () {
   toolchain_create_tree_env_script
   cp -a ${WORKDIR}/toolchain.cmake ${TMPDIR}

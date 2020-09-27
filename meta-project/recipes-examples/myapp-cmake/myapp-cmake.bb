@@ -29,7 +29,7 @@ OECMAKE_GENERATOR = "Unix Makefiles"
 # Configuration for external directory
 inherit externalsrc
 EXTERNALSRC = "${COREBASE}/../myapp-cmake"
-EXTERNALSRC_BUILD = "${EXTERNALSRC}/build"
+EXTERNALSRC_BUILD = "${EXTERNALSRC}/build_bitbake"
 #WORKDIR = "${EXTERNALSRC}/build_using_bitbake"
 
 # This populates a SDK/toolchain for this specific recipe, usuable by other IDE's.

@@ -5,3 +5,4 @@ build/cache
 build/downloads
 build/sstate-cache
 build/tmp-musl
+myapp-cmake/build*

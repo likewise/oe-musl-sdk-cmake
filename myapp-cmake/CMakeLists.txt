@@ -5,7 +5,7 @@ set (myapp_VERSION_MAJOR 1)
 set (myapp_VERSION_MINOR 0)
 
 # GCC and Clang have different defaults, use identical flags
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -no-pie")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c99 -no-pie -Og")
 
 # add the executable
 add_executable (myapp myapp.c)

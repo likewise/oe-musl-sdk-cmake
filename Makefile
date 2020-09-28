@@ -1,8 +1,5 @@
-# Bitbake MUSL CMake Clang combo broken because -mmusl leaks into toolchain.cmake
+# Bitbake MUSL CMake Clang combo broken because -mmusl leaks into toolchain.cmake, we patch it
 all: ./myapp-cmake/build_bitbake/myapp ./myapp-cmake/build_bitbake_clang/myapp ./myapp-cmake/build_sdk/myapp ./myapp-cmake/build_sdk_clang/myapp
-
-#all: ./myapp-cmake/build_bitbake/myapp ./myapp-cmake/build_sdk/myapp ./myapp-cmake/build_sdk_clang/myapp
-
 	echo
 	file myapp-cmake/build_bitbake/myapp
 	echo
@@ -11,6 +8,10 @@ all: ./myapp-cmake/build_bitbake/myapp ./myapp-cmake/build_bitbake_clang/myapp .
 	file myapp-cmake/build_sdk/myapp
 	echo
 	file myapp-cmake/build_sdk_clang/myapp
+
+qemu:
+	# CTRL-A, X to quit.   (Alternatively CTRL-A, C, then quit<enter> to exit)
+	(source ./openembedded-core/oe-init-build-env && runqemu qemux86-64 core-image-minimal-dev nographic)
 
 # Clean both application builds, the installed SDK and SDK installer
 clean: clean_app clean_sdk
@@ -41,14 +42,14 @@ clean_app_sdk_clang:
 clean_sdk:
 	rm -rf /tmp/oe-sdk-cmake
 	rm -rf ./build/tmp-musl/deploy/sdk
-	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal -c cleanall)
+	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal-dev -c cleanall)
 
 # Tell make these targets are phony; i.e. not real files
 .PHONY: clean clean_sdk clean_app clean_app_bitbake clean_app_bitbake_clang clean_app_sdk clean_app_sdk_clang
 
 # SDK Installer Build
 ./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh:
-	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal -c populate_sdk)
+	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal-dev -c populate_sdk)
 
 # SDK Installation
 /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl: ./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh
@@ -72,7 +73,7 @@ clean_sdk:
 	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake -DCMAKE_VERBOSE_MAKEFILE=1 . .. && \
 	make)
 
-# Application Build using Installed SDK Clang
+# Application Build using Installed SDK Clang (note that we patch meta-clang for now!)
 ./myapp-cmake/build_sdk_clang/myapp: /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl bitbake/bin/bitbake meta-clang/README.md
 	cd meta-clang && patch -N -p1 -i ../meta-clang-musl-cmake-fix.patch || true
 	(source /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl && \

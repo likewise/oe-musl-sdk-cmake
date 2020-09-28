@@ -1,9 +1,15 @@
 #include <stdio.h>
 
-int
-main(int argc, char *argv[])
+static int test(void)
 {
-	printf("Hello world\n");
+  int a = 7;
+  int b = 6;
+  return a * b;
+}
 
-	return 0;
+int main(int argc, char *argv[])
+{
+  int result = test();
+  printf("Hello world\n");
+  return result;
 }

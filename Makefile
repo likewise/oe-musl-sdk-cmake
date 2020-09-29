@@ -19,13 +19,13 @@ clean: clean_app clean_sdk
 clean_app: clean_app_bitbake clean_app_bitbake_clang clean_app_sdk clean_app_sdk_clang
 
 # Clean the application that was built with BitBake
-clean_app_bitbake:
+clean_app_bitbake: openembedded
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake -c cleanall)
 	# EXTERNALSRC cleanall does not clean build directory?
 	rm -rf myapp-cmake/build_bitbake
 
 # Clean the application that was built with BitBake Clang
-clean_app_bitbake_clang:
+clean_app_bitbake_clang: openembedded
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake-clang -c cleanall)
 	# EXTERNALSRC cleanall does not clean build directory?
 	rm -rf myapp-cmake/build_bitbake_clang
@@ -48,7 +48,7 @@ clean_sdk:
 .PHONY: clean clean_sdk clean_app clean_app_bitbake clean_app_bitbake_clang clean_app_sdk clean_app_sdk_clang
 
 # SDK Installer Build
-./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh:
+./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh: openembedded
 	(source ./openembedded-core/oe-init-build-env && bitbake core-image-minimal-dev -c populate_sdk)
 
 # SDK Installation
@@ -56,11 +56,11 @@ clean_sdk:
 	./build/tmp-musl/deploy/sdk/oecore-x86_64-core2-64-toolchain-nodistro.0.sh -d /tmp/oe-sdk-cmake -y
 
 # Application Build using OE Bitbake:
-./myapp-cmake/build_bitbake/myapp: openembedded-core/oe-init-build-env bitbake/bin/bitbake
+./myapp-cmake/build_bitbake/myapp: openembedded
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake)
 
 # Application Build using OE Bitbake w/ Clang:
-./myapp-cmake/build_bitbake_clang/myapp: openembedded-core/oe-init-build-env bitbake/bin/bitbake meta-clang/README.md
+./myapp-cmake/build_bitbake_clang/myapp: openembedded
 	cd meta-clang && patch -N -p1 -i ../meta-clang-musl-cmake-fix.patch || true
 	(source ./openembedded-core/oe-init-build-env && bitbake myapp-cmake-clang)
 
@@ -74,7 +74,7 @@ clean_sdk:
 	make)
 
 # Application Build using Installed SDK Clang (note that we patch meta-clang for now!)
-./myapp-cmake/build_sdk_clang/myapp: /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl bitbake/bin/bitbake meta-clang/README.md
+./myapp-cmake/build_sdk_clang/myapp: /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl
 	cd meta-clang && patch -N -p1 -i ../meta-clang-musl-cmake-fix.patch || true
 	(source /tmp/oe-sdk-cmake/environment-setup-core2-64-oe-linux-musl && \
 	export CC=$$CLANGCC && \
@@ -85,6 +85,9 @@ clean_sdk:
 	cd build_sdk_clang && \
 	cmake -DCMAKE_TOOLCHAIN_FILE=$$OECORE_NATIVE_SYSROOT/usr/share/cmake/OEToolchainConfig.cmake -DCMAKE_VERBOSE_MAKEFILE=1 . .. && \
 	make)
+
+.PHONY: openembedded
+openembedded: openembedded-core/oe-init-build-env bitbake/bin/bitbake meta-clang/README.md
 
 openembedded-core/oe-init-build-env:
 	git submodule update --init --recursive

@@ -1,0 +1,7 @@
+[
+    {
+        "name": "oe-linux-musl-gcc",
+        "toolchainFile": "/tmp/oe-sdk-cmake/sysroots/x86_64-oesdk-linux/usr/share/cmake/OEToolchainConfig.cmake",
+        "environmentSetupScript": "/tmp/oe-sdk-cmake/environment-setup-corei7-64-oe-linux-musl"
+    }
+]

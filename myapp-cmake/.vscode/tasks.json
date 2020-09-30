@@ -1,0 +1,41 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run make",
+            "group": "build",
+            "type": "shell",
+            "command": "make",
+            "options": {"cwd": "${workspaceFolder}/build"},
+            "args": ["-j", "20"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Deploy app on target",
+            "type": "shell",
+            "command": "scp",
+            "args": ["-oStrictHostKeyChecking=no", "-oUserKnownHostsFile=/dev/null",
+                "${workspaceFolder}/build/${config:target-binary}",
+                "root@${config:target-ipaddr}:/tmp/"],
+            "dependsOn": ["Run make"],
+            "problemMatcher": []
+        },
+        {
+            "label": "Kill gdbserver on target",
+            "type": "shell",
+            "command": "ssh",
+            "args": ["${config:target-ipaddr}", "killall", "gdbserver", ";", "true"],
+            "presentation": { "reveal": "never" },
+            "problemMatcher": []
+        },
+        {
+            "label": "Run gdbserver on target",
+            "type": "shell",
+            "command": "ssh",
+            "args": ["-t", "-t", "${config:target-ipaddr}", ".", "/etc/profile", "\\;" , "gdbserver", "--multi", "0.0.0.0:1234"],
+            "presentation": { "reveal": "always" },
+            "problemMatcher": [],
+            // "dependsOn": ["Kill gdbserver"]
+        },
+    ],
+}

@@ -1,0 +1,47 @@
+{
+    "sdk-native-sysroot": "/tmp/oe-sdk-cmake/sysroots/x86_64-oesdk-linux",
+    "sdk-target-sysroot": "/tmp/oe-sdk-cmake/sysroots/core2-64-oe-linux-musl",
+    "target-ipaddr": "192.168.7.2",
+    "target-binary" : "myapp",
+
+    "files.trimTrailingWhitespace": true, //Nice habit
+    "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/.clangd/**": true, //contains the local clang intellisense database
+        "**/build/**": true,
+        "**/build_x86/**": true,
+    },
+
+    "cmake.configureOnOpen": true,
+    "cmake.buildDirectory": "${workspaceRoot}/build", //Not working for clangd < v.10.0
+    "cmake.preferredGenerators": ["Unix Makefiles"],
+    "clangd.arguments": [
+        "--compile-commands-dir=build",
+        "-header-insertion=never"
+    ],
+
+    "C_Cpp.default.configurationProvider": "vector-of-bool.cmake-tools",
+    "C_Cpp.default.cStandard": "c11",
+    "C_Cpp.default.cppStandard": "c++17",
+    "C_Cpp.workspaceParsingPriority": "medium",
+    "C_Cpp.formatting": "Disabled",         //Is provided by clangd
+    // "C_Cpp.intelliSenseEngine": "Disabled", //Is provided by clangd
+    "C_Cpp.autocomplete": "Disabled",       //Is provided by clangd
+    "C_Cpp.errorSquiggles": "Disabled",     //Is provided by clangd
+
+    "multiCommand.commands": [
+        {
+            "command": "multiCommand.BuildDeployAndDebug",
+            "sequence": [
+                {
+                    "command": "workbench.action.tasks.runTask",
+                    "args": "Run gdbserver on target"
+                },
+                {
+                    "command": "workbench.action.debug.start",
+                    "args": ""
+                },
+            ]
+        },
+    ],
+}

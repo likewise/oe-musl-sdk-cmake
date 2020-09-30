@@ -1,0 +1,61 @@
+{
+    "version": "0.2.0",
+    "inputs": [],
+    "configurations": [
+        {
+            "name": "Via GDB server for myapp",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/${config:target-binary}",
+            "args": [],
+            "targetArchitecture": "x86_64",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build",
+            "environment": [],
+            "externalConsole": false,
+            "preLaunchTask": "Deploy app on target",
+            // "postDebugTask"  : "Kill gdbserver",
+            "serverLaunchTimeout": 1000,
+            "pipeTransport": {
+                "debuggerPath": "${config:sdk-native-sysroot}/usr/bin/x86_64-oe-linux-musl/x86_64-oe-linux-musl-gdb -q",
+                "pipeProgram": "/bin/bash",
+                "pipeArgs": [
+                    "-c"
+                ],
+                "pipeCwd": "${workspaceFolder}/build"
+            },
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "text": "target extended-remote ${config:target-ipaddr}:1234"
+                },
+                {
+                    "text": "handle SIGILL pass nostop noprint"
+                },
+                {
+                    "text": "file ${workspaceFolder}/build/${config:target-binary}"
+                },
+                // {
+                    // "text": "add-auto-load-safe-path ${config:sdk-native-sysroot}/arm-buildroot-linux-uclibcgnueabihf/sysroot/usr/lib/libstdc++.so.6.0.22-gdb.py"
+                // },
+                // { "text": "set solib-search-path /tmp/" },
+                {
+                    "text": "set remote exec-file /tmp/${config:target-binary}"
+                },
+                {
+                    "text": "set sysroot ${config:sdk-target-sysroot}"
+                },
+                {
+                    "text": "set substitute-path /usr/src/debug ${config:sdk-target-sysroot}/usr/src/debug"
+                },
+                // {   "text": "set args -a -s" },
+                {
+                    "text": "set follow-exec-mode same"
+                },
+                {
+                    "text": "-enable-pretty-printing"
+                },
+            ]
+        }
+    ]
+}

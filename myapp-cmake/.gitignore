@@ -1,5 +1,5 @@
 oe-logs
 oe-workdir
-build
-build_sdk
+build*
 myapp
+CMakeFiles

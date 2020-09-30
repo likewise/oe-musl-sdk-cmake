@@ -12,6 +12,13 @@
         "**/build_x86/**": true,
     },
 
+    // we must use the SDK provided cmake, which is run under SDK environment.
+    // this script sources that SDK environment, then calls the SDK provided cmake.
+    "cmake.cmakePath": "/home/leon/sandbox/sidebranch/axon/oe-musl-sdk-cmake/cmake-ide.sh",
+
+    // unfortunately, this alone will not work due to missing SDK environment:
+    //"cmake.cmakePath": "/tmp/oe-sdk-cmake/sysroots/x86_64-oesdk-linux/usr/bin/cmake",
+
     "cmake.configureOnOpen": true,
     "cmake.buildDirectory": "${workspaceRoot}/build", //Not working for clangd < v.10.0
     "cmake.preferredGenerators": ["Unix Makefiles"],
